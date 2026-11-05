@@ -1,0 +1,140 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Better4Nix AST v1",
+  "type": "object",
+  "required": ["ast_version", "root"],
+  "properties": {
+    "ast_version": { "const": "1" },
+    "root": { "$ref": "#/definitions/node" }
+  },
+  "definitions": {
+    "node": {
+      "oneOf": [
+        { "$ref": "#/definitions/attrset" },
+        { "$ref": "#/definitions/list" },
+        { "$ref": "#/definitions/str" },
+        { "$ref": "#/definitions/int" },
+        { "$ref": "#/definitions/bool" },
+        { "$ref": "#/definitions/null" },
+        { "$ref": "#/definitions/ident" },
+        { "$ref": "#/definitions/call" },
+        { "$ref": "#/definitions/let" },
+        { "$ref": "#/definitions/with" },
+        { "$ref": "#/definitions/select" }
+      ]
+    },
+    "attrset": {
+      "type": "object",
+      "required": ["type", "entries"],
+      "properties": {
+        "type": { "const": "AttrSet" },
+        "entries": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["key", "value"],
+            "properties": {
+              "key": { "type": "string" },
+              "value": { "$ref": "#/definitions/node" }
+            }
+          }
+        }
+      }
+    },
+    "list": {
+      "type": "object",
+      "required": ["type", "items"],
+      "properties": {
+        "type": { "const": "List" },
+        "items": { "type": "array", "items": { "$ref": "#/definitions/node" } }
+      }
+    },
+    "str": {
+      "type": "object",
+      "required": ["type", "value"],
+      "properties": {
+        "type": { "const": "Str" },
+        "value": { "type": "string" }
+      }
+    },
+    "int": {
+      "type": "object",
+      "required": ["type", "value"],
+      "properties": {
+        "type": { "const": "Int" },
+        "value": { "type": "integer" }
+      }
+    },
+    "bool": {
+      "type": "object",
+      "required": ["type", "value"],
+      "properties": {
+        "type": { "const": "Bool" },
+        "value": { "type": "boolean" }
+      }
+    },
+    "null": {
+      "type": "object",
+      "required": ["type"],
+      "properties": { "type": { "const": "Null" } }
+    },
+    "ident": {
+      "type": "object",
+      "required": ["type", "name"],
+      "properties": {
+        "type": { "const": "Ident" },
+        "name": { "type": "string" }
+      }
+    },
+    "call": {
+      "type": "object",
+      "required": ["type", "fn", "args"],
+      "properties": {
+        "type": { "const": "Call" },
+        "fn": { "type": "string" },
+        "args": { "type": "array", "items": { "$ref": "#/definitions/node" } },
+        "kwargs": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/definitions/node" }
+        }
+      }
+    },
+    "let": {
+      "type": "object",
+      "required": ["type", "bindings", "body"],
+      "properties": {
+        "type": { "const": "Let" },
+        "bindings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name", "value"],
+            "properties": {
+              "name": { "type": "string" },
+              "value": { "$ref": "#/definitions/node" }
+            }
+          }
+        },
+        "body": { "$ref": "#/definitions/node" }
+      }
+    },
+    "with": {
+      "type": "object",
+      "required": ["type", "scope", "body"],
+      "properties": {
+        "type": { "const": "With" },
+        "scope": { "$ref": "#/definitions/node" },
+        "body": { "$ref": "#/definitions/node" }
+      }
+    },
+    "select": {
+      "type": "object",
+      "required": ["type", "base", "path"],
+      "properties": {
+        "type": { "const": "Select" },
+        "base": { "$ref": "#/definitions/node" },
+        "path": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  }
+}

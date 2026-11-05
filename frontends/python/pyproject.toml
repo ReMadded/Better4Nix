@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "better4nix-frontend-python"
+version = "0.1.0"
+description = "Python frontend for Better4Nix"
+requires-python = ">=3.10"
+dependencies = []
+
+[project.scripts]
+better4nix-frontend-py = "better4nix_frontend_python.main:main"
+
+[tool.setuptools.packages.find]
+include = ["better4nix_frontend_python*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

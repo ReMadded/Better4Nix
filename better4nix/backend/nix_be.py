@@ -94,10 +94,16 @@ def render_env(kwargs: dict) -> str:
     shell_hook = kwargs.get("shell_hook")
     hook_value = shell_hook["value"] if shell_hook and shell_hook.get("type") == "Str" else None
 
+    allow_unfree_node = kwargs.get("allow_unfree")
+    allow_unfree = bool(allow_unfree_node.get("value", False)) if allow_unfree_node and allow_unfree_node.get("type") == "Bool" else False
+
+    if allow_unfree:
+        header = "{ pkgs ? import <nixpkgs> { config.allowUnfree = true; } }:\n"
+    else:
+        header = "{ pkgs ? import <nixpkgs> {} }:\n"
+
     pkg_attrs = languages + packages
     nur_attrs = [f"nur.{p}" for p in from_nur]
-
-    header = "{ pkgs ? import <nixpkgs> {} }:\n"
 
     if from_nur:
         nur_url = "https://github.com/nix-community/NUR/archive/master.tar.gz"

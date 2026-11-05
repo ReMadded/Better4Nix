@@ -3,6 +3,7 @@ pkgs.mkShell {
   buildInputs = with pkgs; [
     nodejs
     go
+    rustup
     git
     ripgrep
   ];

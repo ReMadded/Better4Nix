@@ -4,7 +4,8 @@
 
 If you know Python but want to avoid the complex functional syntax of Nix, Better4Nix handles the heavy lifting for you: you describe your environment in familiar syntax, and Better4Nix compiles it into a native `shell.nix`. Nix still provides the isolation, reproducibility, and atomic rollbacks — Better4Nix just gives you a friendly frontend.
 
-> **Status: v0.1 (beta).** The core works end-to-end. Rust (`rustc` + `cargo`) is verified. One frontend (Python) is available. NUR support exists in the DSL but is not fully enabled in the demo — pinning is on the roadmap. A hash fix for the `sqlite` NUR package has been sent to `milahu/nur-packages`.
+> **Status: v0.2 (beta).** The core works end-to-end. Rust (`rustc` + `cargo`) is verified. Pinning (`nixpkgs_rev` + `nixpkgs_sha256`) is implemented. One frontend (Python) is available. NUR support exists in the DSL but is not fully enabled in the demo.
+
 
 ---
 
@@ -34,8 +35,7 @@ For Rust, use `rustc` and `cargo` (not `rustup`, not `rust`):
 
 ## 🚧 Not Ready Yet
 
-  * **`from_nur=[...]`** — exists in the DSL, but is **not enabled in the demo**. NUR packages can fail due to unfree licenses, missing `cargoHash`, outdated `hash`, or incompatibility with the current `<nixpkgs>`. Pinning nixpkgs is required for stable `from_nur` — see the Roadmap. (A hash fix for `sqlite` has already been sent to `milahu/nur-packages`.)
-  * **`nixpkgs_rev`** — accepted by the DSL, **not implemented yet**. This is the main blocker for reproducible `from_nur`.
+  * **`from_nur=[...]`** — exists in the DSL, but is **not enabled in the demo**. NUR packages can fail due to unfree licenses, missing `cargoHash`, outdated `hash`, or incompatibility with the current `<nixpkgs>`. Even with `nixpkgs_rev` + `nixpkgs_sha256` pinning, NUR packages may be broken upstream. A hash fix for the `sqlite` NUR package was sent to `milahu/nur-packages`, but the PR was closed: that package is for the `reuse-schema` branch and is outdated for `main`. **Use `sqlite` from `nixpkgs` instead.**
   * **Flakes** — not supported yet.
   * **Other frontends** (JS, Go, ...) — on the roadmap.
 
@@ -75,6 +75,8 @@ Open `examples/config.py` and describe your environment using simple Python meth
     env(
         languages=["nodejs", "go", "rustc", "cargo"],
         packages=["git", "ripgrep"],
+        nixpkgs_rev="nixos-24.05",
+        nixpkgs_sha256="sha256-OnSAY7XDSx7CtDoqNh8jwVwh4xNL/2HaJxGjryLWzX8=",
         shell_hook="echo 'dev shell ready'",
     )
 
@@ -85,7 +87,7 @@ Open `examples/config.py` and describe your environment using simple Python meth
 
 Generated `examples/config.nix`:
 
-    { pkgs ? import<nixpkgs> {} }:
+    { pkgs ? import (builtins.fetchTarball { url = "https://github.com/NixOS/nixpkgs/archive/nixos-24.05.tar.gz"; sha256 = "sha256-OnSAY7..."; }) {} }:
     pkgs.mkShell{
       buildInputs = with pkgs; [
         nodejs
@@ -129,8 +131,7 @@ Anything else — `class`, `def`, `for`, `while`, `if`, `import`, `try`, generat
   * [x] Python Frontend (`better4nix-frontend-py`)
   * [x] End-to-end: `config.py` → `shell.nix` → `nix-shell`
   * [x] Rust support verified (`rustc` + `cargo` via `languages=[...]`)
-  * [x] `sqlite` NUR package hash fixed (PR sent to `milahu/nur-packages`)
-  * [ ] Pin nixpkgs (`nixpkgs_rev`) for reproducibility and stable NUR packages
+  * [x] Pin nixpkgs (`nixpkgs_rev`) for reproducibility and stable NUR packages
   * [ ] `from_nur` examples verified against a pinned nixpkgs
   * [ ] Own NUR repo / flake with a small set of verified packages
   * [ ] JS / Go frontends

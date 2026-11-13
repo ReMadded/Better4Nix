@@ -4,8 +4,7 @@
 
 If you know Python but want to avoid the complex functional syntax of Nix, Better4Nix handles the heavy lifting for you: you describe your environment in familiar syntax, and Better4Nix compiles it into a native `shell.nix`. Nix still provides the isolation, reproducibility, and atomic rollbacks — Better4Nix just gives you a friendly frontend.
 
-> **Status: v0.2 (beta).** The core works end-to-end. Rust (`rustc` + `cargo`) is verified. Pinning (`nixpkgs_rev` + `nixpkgs_sha256`) is implemented. One frontend (Python) is available. NUR support exists in the DSL but is not fully enabled in the demo.
-
+> **Status: v0.3 (beta).** The core works end-to-end. Rust (`rustc` + `cargo`) is verified. Pinning is implemented via `nixpkgs_rev` + `nixpkgs_sha256` and via flakes (`flake.nix` + `flake.lock`). One frontend (Python) is available. NUR support exists in the DSL but is not fully enabled in the demo.
 
 ---
 
@@ -100,6 +99,12 @@ Generated `examples/config.nix`:
       shellHook = "echo 'dev shell ready'";
     }
 
+Alternatively, the repository ships a `flake.nix`. To enter the dev shell:
+
+    nix develop
+
+This pins all inputs via `flake.lock` — no need for `nixpkgs_rev` / `nixpkgs_sha256`.
+
 ---
 
 ## 🐍 The Python Subset
@@ -135,7 +140,7 @@ Anything else — `class`, `def`, `for`, `while`, `if`, `import`, `try`, generat
   * [ ] `from_nur` examples verified against a pinned nixpkgs
   * [ ] Own NUR repo / flake with a small set of verified packages
   * [ ] JS / Go frontends
-  * [ ] Flake output (`flake.nix` \+ `nix develop`)
+  * [x] Flake output (`flake.nix` \+ `nix develop`)
 
 ---
 

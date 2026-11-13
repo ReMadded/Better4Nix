@@ -97,10 +97,34 @@ def render_env(kwargs: dict) -> str:
     allow_unfree_node = kwargs.get("allow_unfree")
     allow_unfree = bool(allow_unfree_node.get("value", False)) if allow_unfree_node and allow_unfree_node.get("type") == "Bool" else False
 
-    if allow_unfree:
-        header = "{ pkgs ? import <nixpkgs> { config.allowUnfree = true; } }:\n"
+    nixpkgs_rev_node = kwargs.get("nixpkgs_rev")
+    rev_value = nixpkgs_rev_node["value"] if nixpkgs_rev_node and nixpkgs_rev_node.get("type") == "Str" else None
+
+    nixpkgs_sha256_node = kwargs.get("nixpkgs_sha256")
+    sha256_value = nixpkgs_sha256_node["value"] if nixpkgs_sha256_node and nixpkgs_sha256_node.get("type") == "Str" else None
+
+    if rev_value and not sha256_value:
+        raise NixRenderError("nixpkgs_rev requires nixpkgs_sha256")
+
+    if rev_value and sha256_value:
+        url = f"https://github.com/NixOS/nixpkgs/archive/{rev_value}.tar.gz"
+        if allow_unfree:
+            header = (
+                "{ pkgs ? import (builtins.fetchTarball { "
+                f'url = "{url}"; sha256 = "{sha256_value}"; '
+                "}) { config.allowUnfree = true; } }:\n"
+            )
+        else:
+            header = (
+                "{ pkgs ? import (builtins.fetchTarball { "
+                f'url = "{url}"; sha256 = "{sha256_value}"; '
+                "}) {} }:\n"
+            )
     else:
-        header = "{ pkgs ? import <nixpkgs> {} }:\n"
+        if allow_unfree:
+            header = "{ pkgs ? import <nixpkgs> { config.allowUnfree = true; } }:\n"
+        else:
+            header = "{ pkgs ? import <nixpkgs> {} }:\n"
 
     pkg_attrs = languages + packages
     nur_attrs = [f"nur.{p}" for p in from_nur]
@@ -128,7 +152,6 @@ def render_env(kwargs: dict) -> str:
     body_lines.append("}")
 
     return header + prelude + "\n".join(body_lines)
-
 
 def _str_list(node: Any) -> list[str]:
     if node is None:

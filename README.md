@@ -4,7 +4,7 @@
 
 If you know Python but want to avoid the complex functional syntax of Nix, Better4Nix handles the heavy lifting for you: you describe your environment in familiar syntax, and Better4Nix compiles it into a native `shell.nix`. Nix still provides the isolation, reproducibility, and atomic rollbacks — Better4Nix just gives you a friendly frontend.
 
-> **Status: v0.3 (beta).** The core works end-to-end. Rust (`rustc` + `cargo`) is verified. Pinning is implemented via `nixpkgs_rev` + `nixpkgs_sha256` and via flakes (`flake.nix` + `flake.lock`). One frontend (Python) is available. NUR support exists in the DSL but is not fully enabled in the demo.
+> **Status: v0.4 (beta).** The core works end-to-end. Rust (`rustc` + `cargo`) is verified. Pinning is implemented via `nixpkgs_rev` + `nixpkgs_sha256` and via flakes (`flake.nix` + `flake.lock`). `from_nur` verified against a pinned nixpkgs. One frontend (Python) is available. NUR support exists in the DSL but is not fully enabled in the demo.
 
 ---
 
@@ -105,6 +105,10 @@ Alternatively, the repository ships a `flake.nix`. To enter the dev shell:
 
 This pins all inputs via `flake.lock` — no need for `nixpkgs_rev` / `nixpkgs_sha256`.
 
+### NUR packages:
+
+See Esmegayt/nur-packages for a personal NUR repository with verified packages.
+
 ---
 
 ## 🐍 The Python Subset
@@ -137,8 +141,8 @@ Anything else — `class`, `def`, `for`, `while`, `if`, `import`, `try`, generat
   * [x] End-to-end: `config.py` → `shell.nix` → `nix-shell`
   * [x] Rust support verified (`rustc` + `cargo` via `languages=[...]`)
   * [x] Pin nixpkgs (`nixpkgs_rev`) for reproducibility and stable NUR packages
-  * [ ] `from_nur` examples verified against a pinned nixpkgs
-  * [ ] Own NUR repo / flake with a small set of verified packages
+  * [x] `from_nur` examples verified against a pinned nixpkgs
+  * [x] Own NUR repo / flake with a small set of verified packages
   * [ ] JS / Go frontends
   * [x] Flake output (`flake.nix` \+ `nix develop`)
 
